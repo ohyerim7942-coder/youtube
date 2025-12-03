@@ -1,7 +1,22 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult, ScriptResult } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// API 키 설정 - 환경 변수에서 가져오거나 프롬프트로 입력받기
+const getApiKey = () => {
+  // Vite 환경 변수 사용
+  if (import.meta.env.VITE_GEMINI_API_KEY) {
+    return import.meta.env.VITE_GEMINI_API_KEY;
+  }
+  
+  // 프롬프트로 API 키 요청
+  const apiKey = prompt('Gemini API 키를 입력해주세요:');
+  if (!apiKey) {
+    throw new Error('API 키가 필요합니다. https://aistudio.google.com/apikey 에서 발급받으세요.');
+  }
+  return apiKey;
+};
+
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
 export const analyzeTextAndSuggest = async (inputText: string): Promise<AnalysisResult> => {
   const modelId = "gemini-2.5-flash"; // Fast and capable for structured analysis
